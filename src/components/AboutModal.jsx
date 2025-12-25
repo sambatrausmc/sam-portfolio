@@ -201,7 +201,12 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
               </h2>
 
               {aboutData.stats && aboutData.stats.length > 0 && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginBottom: '48px' }}>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                  gap: '16px', 
+                  marginBottom: '48px' 
+                }}>
                   {aboutData.stats.map((stat, index) => (
                     <div
                       key={index}
@@ -211,13 +216,34 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
                         borderRadius: '16px',
                         padding: '20px',
                         textAlign: 'center',
+                        minHeight: '140px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}
                     >
                       <div style={{ fontSize: '32px', marginBottom: '8px' }}>{stat.icon}</div>
-                      <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#60a5fa', marginBottom: '4px' }}>
+                      <div style={{ 
+                        fontSize: '28px', 
+                        fontWeight: 'bold', 
+                        color: '#60a5fa', 
+                        marginBottom: '8px',
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
+                      }}>
                         {stat.number}
                       </div>
-                      <div style={{ fontSize: '14px', color: '#9ca3af' }}>{stat.label}</div>
+                      <div style={{ 
+                        fontSize: '13px', 
+                        color: '#9ca3af',
+                        lineHeight: '1.4',
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
+                        textAlign: 'center',
+                      }}>
+                        {stat.label}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -247,16 +273,51 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
                           border: '3px solid #0f0f0f',
                         }}
                       />
-                      <h3 style={{ fontSize: '28px', fontWeight: 'bold', color: 'white', marginBottom: '8px' }}>{exp.role}</h3>
-                      <p style={{ fontSize: '20px', color: '#60a5fa', marginBottom: '4px' }}>{exp.company}</p>
+                      <h3 style={{ 
+                        fontSize: '28px', 
+                        fontWeight: 'bold', 
+                        color: 'white', 
+                        marginBottom: '8px',
+                        wordBreak: 'break-word',
+                      }}>
+                        {exp.role}
+                      </h3>
+                      <p style={{ 
+                        fontSize: '20px', 
+                        color: '#60a5fa', 
+                        marginBottom: '4px',
+                        wordBreak: 'break-word',
+                      }}>
+                        {exp.company}
+                      </p>
                       <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '16px' }}>
                         {exp.dateRange} • {exp.location}
                       </p>
-                      <p style={{ fontSize: '16px', color: '#d1d5db', lineHeight: '1.6', marginBottom: '16px' }}>{exp.description}</p>
+                      <p style={{ 
+                        fontSize: '16px', 
+                        color: '#d1d5db', 
+                        lineHeight: '1.6', 
+                        marginBottom: '16px',
+                        wordBreak: 'break-word',
+                      }}>
+                        {exp.description}
+                      </p>
                       {exp.achievements && exp.achievements.length > 0 && (
                         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                           {exp.achievements.map((achievement, i) => (
-                            <li key={i} style={{ fontSize: '15px', color: '#9ca3af', lineHeight: '1.6', marginBottom: '8px', paddingLeft: '24px', position: 'relative' }}>
+                            <li 
+                              key={i} 
+                              style={{ 
+                                fontSize: '15px', 
+                                color: '#9ca3af', 
+                                lineHeight: '1.6', 
+                                marginBottom: '8px', 
+                                paddingLeft: '24px', 
+                                position: 'relative',
+                                wordBreak: 'break-word',
+                                hyphens: 'auto',
+                              }}
+                            >
                               <span style={{ position: 'absolute', left: 0, color: '#10b981', fontWeight: 'bold' }}>✓</span>
                               {achievement}
                             </li>
