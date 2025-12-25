@@ -37,10 +37,6 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
     }
   };
 
-  const handleWheel = (e) => {
-    e.stopPropagation();
-  };
-
   return (
     <div
       onClick={handleBackdropClick}
@@ -63,7 +59,6 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
       <div
         ref={modalRef}
         tabIndex={-1}
-        onWheel={handleWheel}
         style={{
           position: 'relative',
           width: '100%',
@@ -72,9 +67,10 @@ export default function AboutModal({ tabId, aboutData, onClose }) {
           background: 'rgba(15, 15, 15, 0.98)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '24px',
-          overflowY: 'scroll',
+          overflowY: 'auto',
           overflowX: 'hidden',
           outline: 'none',
+          scrollBehavior: 'smooth',
         }}
       >
         {/* Close Button */}

@@ -26,8 +26,63 @@ export default function useSmoothScroll() {
     let isScrolling = false;
     const sections = document.querySelectorAll('.snap-section');
 
+    // Helper function to check if element is scrollable
+    const isScrollableElement = (element) => {
+      if (!element) return false;
+      
+      const style = window.getComputedStyle(element);
+      const overflowY = style.overflowY;
+      const hasScrollableContent = element.scrollHeight > element.clientHeight;
+      
+      return (overflowY === 'scroll' || overflowY === 'auto') && hasScrollableContent;
+    };
+
+    // Helper function to check if we're at scroll boundary
+    const isAtScrollBoundary = (element, direction) => {
+      if (!element) return true;
+      
+      const { scrollTop, scrollHeight, clientHeight } = element;
+      
+      if (direction > 0) {
+        // Scrolling down - check if at bottom
+        return scrollTop + clientHeight >= scrollHeight - 1;
+      } else {
+        // Scrolling up - check if at top
+        return scrollTop <= 1;
+      }
+    };
+
+    // Find the nearest scrollable parent
+    const findScrollableParent = (element) => {
+      let current = element;
+      
+      while (current && current !== document.body) {
+        if (isScrollableElement(current)) {
+          return current;
+        }
+        current = current.parentElement;
+      }
+      
+      return null;
+    };
+
     // Detect scroll direction and snap to next/prev section
     const handleWheel = (e) => {
+      // Check if the wheel event originated from within a scrollable container
+      const scrollableParent = findScrollableParent(e.target);
+      
+      if (scrollableParent) {
+        // We're inside a scrollable element
+        const direction = e.deltaY > 0 ? 1 : -1;
+        const atBoundary = isAtScrollBoundary(scrollableParent, direction);
+        
+        if (!atBoundary) {
+          // Not at boundary, allow normal scrolling within the container
+          return;
+        }
+        // If at boundary, continue to section snapping below
+      }
+
       if (isScrolling) {
         e.preventDefault();
         return;
@@ -38,6 +93,7 @@ export default function useSmoothScroll() {
 
       // Check if next section exists
       if (nextIndex >= 0 && nextIndex < sections.length) {
+        e.preventDefault();
         isScrolling = true;
         currentSectionIndex = nextIndex;
 
@@ -61,6 +117,15 @@ export default function useSmoothScroll() {
     // Keyboard navigation
     const handleKeyDown = (e) => {
       if (isScrolling) return;
+
+      // Check if we're inside a scrollable modal or container
+      const activeElement = document.activeElement;
+      const scrollableParent = findScrollableParent(activeElement);
+      
+      if (scrollableParent && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        // Let the scrollable container handle it
+        return;
+      }
 
       let targetIndex = currentSectionIndex;
 
