@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { sanityClient, urlFor } from '../lib/sanity';
+import { client, urlFor } from '../lib/sanity';
 import MediaViewer from './MediaViewer';
 
 export default function LibrarySection() {
@@ -10,7 +10,7 @@ export default function LibrarySection() {
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    sanityClient
+    client
       .fetch(
         `*[_type == "library"] | order(order asc) {
           _id,
@@ -19,7 +19,13 @@ export default function LibrarySection() {
           mediaType,
           image,
           videoUrl,
-          videoFile,
+          videoFile {
+            asset-> {
+              url,
+              playbackId,
+              thumbTime
+            }
+          },
           category,
           tags,
           featured,
@@ -143,15 +149,52 @@ export default function LibrarySection() {
               ) : item.mediaType === 'video' ? (
                 <div
                   style={{
+                    position: 'relative',
                     width: '100%',
                     height: '100%',
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2))',
+                    background: item.image
+                      ? 'transparent'
+                      : 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2))',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: '60px' }}>▶️</span>
+                  {/* Use custom thumbnail if available */}
+                  {item.image && (
+                    <img
+                      src={urlFor(item.image).width(400).height(400).url()}
+                      alt={item.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  )}
+                  
+                  {/* Play button overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '80px',
+                      height: '80px',
+                      background: 'rgba(59, 130, 246, 0.9)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '32px',
+                      color: 'white',
+                      border: '3px solid rgba(255, 255, 255, 0.3)',
+                    }}
+                  >
+                    ▶
+                  </div>
                 </div>
               ) : null}
 
