@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { sanityClient, urlFor } from '../lib/sanity';
+import { client, urlFor } from '../lib/sanity';
 import AboutModal from './AboutModal';
 
 export default function AboutSection() {
@@ -12,7 +12,7 @@ export default function AboutSection() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    sanityClient
+    client
       .fetch(
         `*[_type == "about"][0] {
   heroBio,

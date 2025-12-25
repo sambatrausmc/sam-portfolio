@@ -8,6 +8,9 @@ export const client = createClient({
   useCdn: true,
 })
 
+// Export as sanityClient for compatibility with existing imports
+export const sanityClient = client;
+
 const builder = createImageUrlBuilder(client)
 
 export const urlFor = (source) => builder.image(source)
