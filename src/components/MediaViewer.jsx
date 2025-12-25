@@ -8,32 +8,34 @@ export default function MediaViewer({ media, onClose }) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFullCaption, setShowFullCaption] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const videoRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Prevent background scrolling
-// Prevent background scrolling and save position
-useEffect(() => {
-  if (media) {
-    // Save current scroll position
-    const scrollY = window.pageYOffset;
-    
-    // Lock body
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    
-    // Cleanup: restore scroll position
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
+  // Prevent background scrolling and save position
+  useEffect(() => {
+    if (media) {
+      // Save current scroll position
+      const scrollY = window.pageYOffset;
       
-      // Restore scroll position
-      window.scrollTo(0, scrollY);
-    };
-  }
-}, [media]);
+      // Lock body
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      // Cleanup: restore scroll position
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [media]);
 
   // Handle zoom with scroll wheel
   const handleWheel = (e) => {
@@ -94,13 +96,47 @@ useEffect(() => {
     }
   };
 
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
+    }
+    if (newVolume > 0) {
+      setIsMuted(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      if (isMuted) {
+        videoRef.current.muted = false;
+        videoRef.current.volume = volume;
+        setIsMuted(false);
+      } else {
+        videoRef.current.muted = true;
+        setIsMuted(true);
+      }
+    }
+  };
+
   // Reset zoom when media changes
   useEffect(() => {
     setZoom(1);
     setPosition({ x: 0, y: 0 });
     setIsPlaying(false);
     setShowFullCaption(false);
+    setVolume(1);
+    setIsMuted(false);
+    setShowVolumeSlider(false);
   }, [media]);
+
+  // Update video volume when component mounts
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = volume;
+    }
+  }, []);
 
   if (!media) return null;
 
@@ -111,6 +147,13 @@ useEffect(() => {
   const captionText = media.description || '';
   const isLongCaption = captionText.length > 80;
   const truncatedCaption = isLongCaption ? captionText.slice(0, 80) + '...' : captionText;
+
+  // Get volume icon based on volume level
+  const getVolumeIcon = () => {
+    if (isMuted || volume === 0) return '🔇';
+    if (volume < 0.5) return '🔉';
+    return '🔊';
+  };
 
   return (
     <div
@@ -289,6 +332,7 @@ useEffect(() => {
                 transform: 'translateX(-50%)',
                 display: 'flex',
                 gap: '12px',
+                alignItems: 'center',
                 background: 'rgba(0, 0, 0, 0.8)',
                 backdropFilter: 'blur(20px)',
                 padding: '16px 24px',
@@ -348,6 +392,66 @@ useEffect(() => {
               >
                 ⏩
               </button>
+
+              {/* Volume Control */}
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginLeft: '12px',
+                  paddingLeft: '12px',
+                  borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+                }}
+                onMouseEnter={() => setShowVolumeSlider(true)}
+                onMouseLeave={() => setShowVolumeSlider(false)}
+              >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleMute();
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    padding: '8px',
+                  }}
+                >
+                  {getVolumeIcon()}
+                </button>
+
+                {/* Volume Slider */}
+                <div
+                  style={{
+                    opacity: showVolumeSlider ? 1 : 0,
+                    width: showVolumeSlider ? '100px' : '0',
+                    transition: 'all 0.3s ease',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={isMuted ? 0 : volume}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleVolumeChange(e);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      width: '100%',
+                      cursor: 'pointer',
+                      accentColor: '#3b82f6',
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Instagram-style Caption for Video */}
