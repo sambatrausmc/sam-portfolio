@@ -5,6 +5,7 @@ import Navigation from './components/Navigation'
 import ProjectsSection from './components/ProjectsSection'
 import LibrarySection from './components/LibrarySection'
 import GetInTouch from './components/GetInTouch'
+import VisualEffects from './components/VisualEffects'
 import useSmoothScroll from './hooks/useSmoothScroll'
 import './index.css'
 
@@ -14,6 +15,9 @@ function App() {
 
   return (
     <div className="App scroll-container">
+      {/* Visual Effects Layer - Behind everything except content */}
+      <VisualEffects />
+      
       {/* Navigation */}
       <Navigation />
       
